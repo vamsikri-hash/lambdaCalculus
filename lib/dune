@@ -1,0 +1,8 @@
+(library
+ (name lambdaCalculus)
+ (modules parser lexer lci ast))
+
+(menhir
+ (modules parser))
+
+(ocamllex lexer)
