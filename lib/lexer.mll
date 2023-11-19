@@ -6,6 +6,8 @@ let string = ['a'-'z']
 
 
 rule read = parse
+| "(" { LPAREN }
+| ")" { RPAREN }
 | " " { APPLICATION }
 | "." { DOT }
 | "\\" { ABSTRACTION }
