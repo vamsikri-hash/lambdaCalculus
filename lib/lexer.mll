@@ -2,7 +2,7 @@
 open Parser
 }
 
-let string = ['a'-'z']
+let var = ['a'-'z']['0'-'9' 'a'-'z']*
 
 
 rule read = parse
@@ -11,5 +11,5 @@ rule read = parse
 | " " { APPLICATION }
 | "." { DOT }
 | "\\" { ABSTRACTION }
-| string { VAR (Lexing.lexeme lexbuf) }
+| var { VAR (Lexing.lexeme lexbuf) }
 | eof { EOF  }

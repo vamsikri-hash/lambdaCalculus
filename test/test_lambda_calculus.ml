@@ -15,11 +15,17 @@ let parser_tests =
              (Abstraction
                 ("x", Application (Var "x", Application (Var "y", Var "z"))))
              (parse "\\x.x y z") );
-         ( "ex4" >:: fun _ ->
+         ( "ex5" >:: fun _ ->
            assert_equal
              (Abstraction
                 ("x", Application (Var "x", Application (Var "y", Var "z"))))
              (parse "(\\x.(x (y z)))") );
+         ( "ex6" >:: fun _ ->
+           assert_equal
+             (Abstraction
+                ( "x23",
+                  Application (Var "x", Application (Var "y45rf", Var "z")) ))
+             (parse "\\x23.x y45rf z") );
        ]
 
 let free_variables_tests =
@@ -34,6 +40,28 @@ let free_variables_tests =
            assert_equal [ "y" ] (free_variables "\\x.(\\y.y x) y") );
        ]
 
+(* Not a better way to write subst tests, as this is relying on some random
+   fresh variable that assumes to be constant every time.
+   TODO: Replace these tests with by checking alpha equivalence *)
+let substitution_tests =
+  "Substitute tests"
+  >::: [
+         ("ex1" >:: fun _ -> assert_equal (Var "y") (substitute "x" "x" "y"));
+         ( "ex2" >:: fun _ ->
+           assert_equal
+             (Application (Var "z", Var "y"))
+             (substitute "x y" "x" "z") );
+         ( "ex1" >:: fun _ ->
+           assert_equal
+             (Abstraction ("x", Application (Var "x", Var "y")))
+             (substitute "\\x.x y" "x" "y") );
+         ( "ex1" >:: fun _ ->
+           assert_equal
+             (Abstraction ("q1", Var "x"))
+             (substitute "\\x.y" "y" "x") );
+       ]
+
 let _ =
   run_test_tt_main parser_tests;
-  run_test_tt_main free_variables_tests
+  run_test_tt_main free_variables_tests;
+  run_test_tt_main substitution_tests
