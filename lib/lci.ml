@@ -17,7 +17,7 @@ let counter = ref 0
    For now, I assume there is no "q" or any var with "q" in LC expression.
    TODO: Think of better way to generate fresh variables.
 *)
-let fresh_varaible () =
+let fresh_variable () =
   counter := !counter + 1;
   "q" ^ string_of_int !counter
 
@@ -29,7 +29,7 @@ let substitute expr var replace_term =
     | (Abstraction (x, e1) as l_term), Var y ->
         if x = y then l_term
         else if List.mem x free_vars then
-          let fv = fresh_varaible () in
+          let fv = fresh_variable () in
           let new_expr = Abstraction (fv, subst_helper e1 (Var x) (Var fv)) in
           subst_helper new_expr (Var y) r
         else Abstraction (x, subst_helper e1 v r)
@@ -43,7 +43,7 @@ let rec alpha_equivalence expr1 expr2 =
   match (expr1, expr2) with
   | Var x, Var y -> if x = y then true else false
   | Abstraction (x1, e1s1), Abstraction (x2, e2s1) ->
-      let fv = fresh_varaible () in
+      let fv = fresh_variable () in
       substitute e1s1 (Var x1) (Var fv) = substitute e2s1 (Var x2) (Var fv)
   | Application (e1s1, e1s2), Application (e2s1, e2s2) ->
       alpha_equivalence e1s1 e2s1 && alpha_equivalence e1s2 e2s2
