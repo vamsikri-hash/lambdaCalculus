@@ -51,11 +51,11 @@ let substitution_tests =
            assert_equal
              (Application (Var "z", Var "y"))
              (substitute "x y" "x" "z") );
-         ( "ex1" >:: fun _ ->
+         ( "ex3" >:: fun _ ->
            assert_equal
              (Abstraction ("x", Application (Var "x", Var "y")))
              (substitute "\\x.x y" "x" "y") );
-         ( "ex1" >:: fun _ ->
+         ( "ex4" >:: fun _ ->
            assert_equal
              (Abstraction ("q1", Var "x"))
              (substitute "\\x.y" "y" "x") );
