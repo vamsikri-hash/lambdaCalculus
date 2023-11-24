@@ -42,27 +42,29 @@ let free_variables_tests =
            assert_equal [ "y" ] (free_variables (parse "\\x.(\\y.y x) y")) );
        ]
 
-(* Not a better way to write subst tests, as this is relying on some random
-   fresh variable that assumes to be constant every time.
-   TODO: Replace these tests with by checking alpha equivalence *)
 let substitution_tests =
   "Substitute tests"
   >::: [
          ( "ex1" >:: fun _ ->
-           assert_equal (Var "y")
-             (substitute (parse "x") (parse "x") (parse "y")) );
+           assert_equal true
+             (alpha_equivalence (parse "y")
+                (substitute (parse "x") (parse "x") (parse "y"))) );
          ( "ex2" >:: fun _ ->
-           assert_equal
-             (Application (Var "z", Var "y"))
-             (substitute (parse "x y") (parse "x") (parse "z")) );
+           assert_equal true
+             (alpha_equivalence (parse "z y")
+                (substitute (parse "x y") (parse "x") (parse "z"))) );
          ( "ex3" >:: fun _ ->
-           assert_equal
-             (Abstraction ("x", Application (Var "x", Var "y")))
-             (substitute (parse "\\x.x y") (parse "x") (parse "y")) );
+           assert_equal true
+             (alpha_equivalence (parse "\\x.x y")
+                (substitute (parse "\\x.x y") (parse "x") (parse "y"))) );
          ( "ex4" >:: fun _ ->
-           assert_equal
-             (Abstraction ("q1", Var "x"))
-             (substitute (parse "\\x.y") (parse "y") (parse "x")) );
+           assert_equal true
+             (alpha_equivalence (parse "\\z.x")
+                (substitute (parse "\\x.y") (parse "y") (parse "x"))) );
+         ( "ex5" >:: fun _ ->
+           assert_equal true
+             (alpha_equivalence (parse "\\z.z x")
+                (substitute (parse "\\x.x y") (parse "y") (parse "x"))) );
        ]
 
 let _ =
