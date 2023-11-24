@@ -5,14 +5,10 @@ let parse s =
   let ast = Parser.prog Lexer.read lexbuf in
   ast
 
-let free_variables s =
-  let rec free_helper acc = function
-    | Var x -> x :: acc
-    | Abstraction (x, e) ->
-        List.filter (fun ele -> ele <> x) (free_helper acc e)
-    | Application (e1, e2) -> free_helper acc e1 @ free_helper acc e2
-  in
-  s |> parse |> free_helper []
+let rec free_variables = function
+  | Var x -> [ x ]
+  | Abstraction (x, e) -> List.filter (fun ele -> ele <> x) (free_variables e)
+  | Application (e1, e2) -> free_variables e1 @ free_variables e2
 
 let counter = ref 0
 
@@ -27,9 +23,6 @@ let fresh_varaible () =
 
 let substitute expr var replace_term =
   let free_vars = free_variables replace_term in
-  let expr = parse expr in
-  let var = parse var in
-  let replace_term = parse replace_term in
   let rec subst_helper e v r =
     match (e, v) with
     | Var x, Var y -> if x = y then r else Var x
@@ -38,7 +31,7 @@ let substitute expr var replace_term =
         else if List.mem x free_vars then
           let fv = fresh_varaible () in
           let new_expr = Abstraction (fv, subst_helper e1 (Var x) (Var fv)) in
-          subst_helper new_expr (Var y) replace_term
+          subst_helper new_expr (Var y) r
         else Abstraction (x, subst_helper e1 v r)
     | Application (e1, e2), Var _ ->
         Application (subst_helper e1 v r, subst_helper e2 v r)
