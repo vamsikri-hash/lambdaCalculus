@@ -48,3 +48,23 @@ let rec alpha_equivalence expr1 expr2 =
   | Application (e1s1, e1s2), Application (e2s1, e2s2) ->
       alpha_equivalence e1s1 e2s1 && alpha_equivalence e1s2 e2s2
   | _, _ -> false
+
+let normal_order_evaluation expr =
+  let rec reduce_normal e =
+    match e with
+    | Var x -> (Var x, false)
+    | Abstraction (x, sub_expr) ->
+        if snd (reduce_normal sub_expr) then
+          (Abstraction (x, fst (reduce_normal sub_expr)), true)
+        else (e, false)
+    | Application (sub_expr1, sub_expr2) -> (
+        match sub_expr1 with
+        | Abstraction (y, sse) -> (substitute sse (Var y) sub_expr2, true)
+        | Application (_, _) | Var _ ->
+            if snd (reduce_normal sub_expr1) then
+              (Application (fst (reduce_normal sub_expr1), sub_expr2), true)
+            else if snd (reduce_normal sub_expr2) then
+              (Application (sub_expr1, fst (reduce_normal sub_expr2)), true)
+            else (Application (sub_expr1, sub_expr2), false))
+  in
+  fst (reduce_normal expr)
