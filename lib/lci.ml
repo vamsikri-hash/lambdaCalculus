@@ -83,6 +83,25 @@ let call_by_name_evaluation expr =
   in
   fst (reduce_cbn expr)
 
+let call_by_value_evaluation e =
+  let rec reduce_cbv e =
+    match e with
+    | Var _ | Abstraction _ -> (e, false)
+    | Application (sub_expr1, sub_expr2) -> (
+        match sub_expr1 with
+        | Abstraction (y, sse) ->
+            if snd (reduce_cbv sub_expr2) then
+              (Application (sub_expr1, fst (reduce_cbv sub_expr2)), true)
+            else (substitute sse (Var y) sub_expr2, true)
+        | Application (_, _) | Var _ ->
+            if snd (reduce_cbv sub_expr1) then
+              (Application (fst (reduce_cbv sub_expr1), sub_expr2), true)
+            else if snd (reduce_cbv sub_expr2) then
+              (Application (sub_expr1, fst (reduce_cbv sub_expr2)), true)
+            else (Application (sub_expr1, sub_expr2), false))
+  in
+  fst (reduce_cbv e)
+
 (* constructing some language primitives *)
 
 let true_ = "\\x.\\y.x"

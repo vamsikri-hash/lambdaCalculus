@@ -107,9 +107,31 @@ let call_by_name_evaluation_tests =
                 (call_by_name_evaluation (parse "x y"))) );
        ]
 
+let call_by_value_evaluation_tests =
+  "Call by value evaluation tests"
+  >::: [
+         ( "ex1" >:: fun _ ->
+           assert_equal true
+             (alpha_equivalence
+                (parse "(\\z.(\\x.x) z) foo")
+                (call_by_value_evaluation
+                   (parse "((\\x.x) (\\z.(\\x.x) z)) foo"))) );
+         ( "ex2" >:: fun _ ->
+           assert_equal true
+             (alpha_equivalence
+                (parse "foo (\\z.(\\x.x) z)")
+                (call_by_value_evaluation
+                   (parse "foo ((\\x.x) (\\z.(\\x.x) z))"))) );
+         ( "ex3" >:: fun _ ->
+           assert_equal true
+             (alpha_equivalence (parse "y y")
+                (call_by_value_evaluation (parse "(\\x.x x) y"))) );
+       ]
+
 let _ =
   run_test_tt_main parser_tests;
   run_test_tt_main free_variables_tests;
   run_test_tt_main substitution_tests;
   run_test_tt_main normal_order_evaluation_tests;
-  run_test_tt_main call_by_name_evaluation_tests
+  run_test_tt_main call_by_name_evaluation_tests;
+  run_test_tt_main call_by_value_evaluation_tests
