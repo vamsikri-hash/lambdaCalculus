@@ -69,6 +69,20 @@ let normal_order_evaluation expr =
   in
   fst (reduce_normal expr)
 
+let call_by_name_evaluation expr =
+  let rec reduce_cbn e =
+    match e with
+    | Var _ | Abstraction _ -> (e, false)
+    | Application (sub_expr1, sub_expr2) -> (
+        match sub_expr1 with
+        | Abstraction (y, sse) -> (substitute sse (Var y) sub_expr2, true)
+        | Application (_, _) | Var _ ->
+            if snd (reduce_cbn sub_expr1) then
+              (Application (fst (reduce_cbn sub_expr1), sub_expr2), true)
+            else (Application (sub_expr1, sub_expr2), false))
+  in
+  fst (reduce_cbn expr)
+
 (* constructing some language primitives *)
 
 let true_ = "\\x.\\y.x"
