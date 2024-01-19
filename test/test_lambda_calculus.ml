@@ -67,7 +67,29 @@ let substitution_tests =
                 (substitute (parse "\\x.x y") (parse "y") (parse "x"))) );
        ]
 
+let normal_order_evaluation_tests =
+  "Normal order evaluation tests"
+  >::: [
+         ( "ex1" >:: fun _ ->
+           assert_equal true
+             (alpha_equivalence (parse "\\x.x")
+                (normal_order_evaluation (parse "\\z.(\\x.x) z"))) );
+         ( "ex2" >:: fun _ ->
+           assert_equal true
+             (alpha_equivalence (parse "foo \\x.x")
+                (normal_order_evaluation (parse "foo \\z.(\\x.x) z"))) );
+         ( "ex3" >:: fun _ ->
+           assert_equal true
+             (alpha_equivalence (parse "\\y.(\\z.z)")
+                (normal_order_evaluation (parse "\\y.(\\z.(\\x.x) z)"))) );
+         ( "ex4" >:: fun _ ->
+           assert_equal true
+             (alpha_equivalence (parse "(foo \\x.x) bar")
+                (normal_order_evaluation (parse "(foo \\z.(\\x.x) z) bar"))) );
+       ]
+
 let _ =
   run_test_tt_main parser_tests;
   run_test_tt_main free_variables_tests;
-  run_test_tt_main substitution_tests
+  run_test_tt_main substitution_tests;
+  run_test_tt_main normal_order_evaluation_tests

@@ -68,3 +68,8 @@ let normal_order_evaluation expr =
             else (Application (sub_expr1, sub_expr2), false))
   in
   fst (reduce_normal expr)
+
+(* constructing some language primitives *)
+
+let true_ = "\\x.\\y.x"
+let false_ = "\\x.\\y.y"
