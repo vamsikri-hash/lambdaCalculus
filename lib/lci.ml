@@ -41,7 +41,7 @@ let substitute expr var replace_term =
 
 let rec alpha_equivalence expr1 expr2 =
   match (expr1, expr2) with
-  | Var x, Var y -> if x = y then true else false
+  | Var x, Var y -> x = y
   | Abstraction (x1, e1s1), Abstraction (x2, e2s1) ->
       let fv = fresh_variable () in
       substitute e1s1 (Var x1) (Var fv) = substitute e2s1 (Var x2) (Var fv)
